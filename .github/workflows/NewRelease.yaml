@@ -1,0 +1,73 @@
+name: ' Create release'
+
+on:
+  workflow_dispatch:
+    inputs:
+      appVersion:
+        description: App version to promote to release (default is latest)
+        required: false
+        default: 'latest'
+      name:
+        description: Name of this release
+        required: true
+        default: ''
+      tag:
+        description: List of commits
+        required: true
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency: release
+
+defaults:
+  run:
+    shell: powershell
+
+env:
+  ALGoOrgSettings: ${{ vars.ALGoOrgSettings }}
+  ALGoRepoSettings: ${{ vars.ALGoRepoSettings }}
+
+jobs:
+  CreateRelease:
+    runs-on: [ windows-latest ]
+    outputs:
+      telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
+      artifacts: ${{ steps.analyzeartifacts.outputs.artifacts }}
+      releaseId: ${{ steps.createrelease.outputs.releaseId }}
+      commitish: ${{ steps.analyzeartifacts.outputs.commitish }}
+      releaseBranch: ${{ steps.createreleasenotes.outputs.releaseBranch }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Initialize the workflow
+        id: init
+        uses: microsoft/AL-Go-Actions/WorkflowInitialize@v3.1
+        with:
+          shell: powershell
+          eventId: "DO0094"
+
+      - name: Read settings
+        id: ReadSettings
+        uses: microsoft/AL-Go-Actions/ReadSettings@v3.1
+        with:
+          shell: powershell
+          parentTelemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
+          get: templateUrl,repoName
+
+
+      - name: Analyze Artifacts
+        id: analyzeartifacts
+        run: |
+          Write-Host "START"
+          ${{ github.event.inputs.tag }} | ForEach-Object {
+          $commit = $_
+          Write-Host $commit
+          Write-Host "------"
+          }
+          Write-Host "END"
+ 
