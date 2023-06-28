@@ -42,11 +42,14 @@ jobs:
         id: readparamters
         run: |
           Write-Host "START!!"
+          $gitcommand = 'git log --format=format:"%C(auto,reset)%h" --author-date-order'
           $listofparameters = "${{ github.event.inputs.tag }}".Split(',')
           foreach ($param in $listofparameters)
           {
-          Write-Host "---"
-          Write-Host $param
+            $gitcommand +=  ' --grep "'+$param.Trim() + '"'
           }
+          $commits = Invoke-Expression $gitcommand
+          [array]::Reverse($commits)
+          Write-Host $commits
           Write-Host "END!!"
  
