@@ -7,10 +7,6 @@ on:
         description: App version to promote to release (default is latest)
         required: false
         default: 'latest'
-      name:
-        description: Name of this release
-        required: true
-        default: ''
       tag:
         description: List of commits
         required: true
@@ -47,10 +43,7 @@ jobs:
         run: |
           Write-Host "START!!"
           $listofparameters = ${{ github.event.inputs.tag }}
-          $listofparameters = $listofparameters.split(",")
-          foreach ($param in $parameters) {
-          Write-Host $param
-          Write-Host "------"
-          }
+          Write-Host "---"
+          Write-Host $listofparameters
           Write-Host "END!!"
  
