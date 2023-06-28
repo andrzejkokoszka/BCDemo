@@ -42,7 +42,7 @@ jobs:
         id: readparamters
         run: |
           Write-Host "START!!"
-          $listofparameters = ${{ github.event.inputs.tag }} | -Split ","
+          $listofparameters = "${{ github.event.inputs.tag }}"
           Write-Host "---"
           Write-Host $listofparameters
           Write-Host "END!!"
