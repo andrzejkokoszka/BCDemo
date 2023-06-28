@@ -45,12 +45,12 @@ jobs:
       - name: Read parameters
         id: readparamters
         run: |
-          Write-Host "START!"
+          Write-Host "START!!"
           $listofparameters = ${{ github.event.inputs.tag }}
           $listofparameters = $listofparameters.split(",")
           foreach ($param in $parameters) {
           Write-Host $param
           Write-Host "------"
           }
-          Write-Host "END!"
+          Write-Host "END!!"
  
