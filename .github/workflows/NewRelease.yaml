@@ -43,7 +43,10 @@ jobs:
         run: |
           Write-Host "START!!"
           $listofparameters = "${{ github.event.inputs.tag }}"
+          foreach ($param in $listofparameters)
+          {
           Write-Host "---"
-          Write-Host $listofparameters
+          Write-Host $param
+          }
           Write-Host "END!!"
  
