@@ -24,8 +24,6 @@ jobs:
       settings: ${{ steps.ReadSettings.outputs.SettingsJson }}
       environments: ${{ steps.ReadSettings.outputs.EnvironmentsJson }}
       environmentCount: ${{ steps.ReadSettings.outputs.EnvironmentCount }}
-      deliveryTargets: ${{ steps.DetermineDeliveryTargets.outputs.DeliveryTargetsJson }}
-      deliveryTargetCount: ${{ steps.DetermineDeliveryTargets.outputs.DeliveryTargetCount }}
       githubRunner: ${{ steps.ReadSettings.outputs.GitHubRunnerJson }}
       githubRunnerShell: ${{ steps.ReadSettings.outputs.GitHubRunnerShell }}
       checkRunId: ${{ steps.CreateCheckRun.outputs.checkRunId }}
@@ -59,15 +57,6 @@ jobs:
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
-
-      - name: Read secrets
-        uses: microsoft/AL-Go-Actions/ReadSecrets@v3.1
-        env:
-          secrets: ${{ toJson(secrets) }}
-        with:
-          shell: powershell
-          settingsJson: ${{ env.Settings }}
-          secrets: ${{ steps.DetermineDeliveryTargetSecrets.outputs.Secrets }}
 
   Build:
     needs: [ Initialization ]
@@ -178,7 +167,7 @@ jobs:
 
       - name: Publish artifacts - apps
         uses: actions/upload-artifact@v3
-        if: github.ref_name == 'main' || startswith(github.ref_name, 'release/') || needs.Initialization.outputs.deliveryTargetCount > 0 || needs.Initialization.outputs.environmentCount > 0
+        if: github.ref_name == 'main' || startswith(github.ref_name, 'release/') || needs.Initialization.outputs.environmentCount > 0
         with:
           name: ${{ env.AppsArtifactsName }}
           path: '${{ matrix.project }}/.buildartifacts/Apps/'
@@ -186,7 +175,7 @@ jobs:
 
       - name: Publish artifacts - dependencies
         uses: actions/upload-artifact@v3
-        if: github.ref_name == 'main' || startswith(github.ref_name, 'release/') || needs.Initialization.outputs.deliveryTargetCount > 0 || needs.Initialization.outputs.environmentCount > 0
+        if: github.ref_name == 'main' || startswith(github.ref_name, 'release/') || needs.Initialization.outputs.environmentCount > 0
         with:
           name: ${{ env.DependenciesArtifactsName }}
           path: '${{ matrix.project }}/.buildartifacts/Dependencies/'
@@ -194,7 +183,7 @@ jobs:
 
       - name: Publish artifacts - test apps
         uses: actions/upload-artifact@v3
-        if: github.ref_name == 'main' || startswith(github.ref_name, 'release/') || needs.Initialization.outputs.deliveryTargetCount > 0 || needs.Initialization.outputs.environmentCount > 0
+        if: github.ref_name == 'main' || startswith(github.ref_name, 'release/') || needs.Initialization.outputs.environmentCount > 0
         with:
           name: ${{ env.TestAppsArtifactsName }}
           path: '${{ matrix.project }}/.buildartifacts/TestApps/'
