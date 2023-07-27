@@ -7,10 +7,6 @@ on:
         description: App version to promote to release (default is latest)
         required: false
         default: 'latest'
-      name:
-        description: Name of this release
-        required: true
-        default: ''
       tag:
         description: List of commits
         required: true
@@ -52,5 +48,8 @@ jobs:
           Write-Host $param
           Write-Host "------"
           }
-          Write-Host "END!"
+          $commits = Invoke-Expression $gitcommand
+          [array]::Reverse($commits)
+          Write-Host $commits
+          Write-Host "END!!"
  
