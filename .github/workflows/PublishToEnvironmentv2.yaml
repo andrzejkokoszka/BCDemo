@@ -1,4 +1,4 @@
-name: ' Publish To Environment'
+name: ' Publish To Environmentv2'
 
 on:
   workflow_dispatch:
