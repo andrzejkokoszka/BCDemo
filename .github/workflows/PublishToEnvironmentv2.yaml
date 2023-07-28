@@ -219,6 +219,8 @@ jobs:
           Write-Host "projects=$projects"
           $refname = "$ENV:GITHUB_REF_NAME".Replace('/','_')
           Write-Host "REFNAME = $refname"
+          $workspc = $ENV:GITHUB_WORKSPACE
+          Write-Host "WROKSPACE = $workspc"
 
       - name: Deploy
         uses: microsoft/AL-Go-Actions/Deploy@v3.1
