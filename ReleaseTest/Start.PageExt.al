@@ -8,7 +8,7 @@ pageextension 50001 StartExt extends "Headline RC Business Manager"
     {
         modify(GreetingText)
         {
-            Caption = 'Ticekt2';
+            Caption = 'MAIN';
         }
     }
 }
