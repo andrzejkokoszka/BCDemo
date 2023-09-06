@@ -3,5 +3,12 @@
   "templateUrl": "https://github.com/microsoft/AL-Go-PTE@main",
   "CICDPullRequestBranches": [],
   "CICDPushBranches": [],
-  "skipUpgrade" : true
+  "skipUpgrade" : true,
+    "DeployToUAT": {
+    "Branches": [
+      "uat"
+    ],
+    "EnvironmentName": "UAT",
+    "Projects": "*"
+  },
 }
