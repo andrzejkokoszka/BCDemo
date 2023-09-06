@@ -9,5 +9,6 @@
     ],
     "EnvironmentName": "UAT",
     "Projects": "*"
-  }
+  },
+  "skipUpgrade" : true
 }
