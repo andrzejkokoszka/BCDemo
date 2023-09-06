@@ -3,12 +3,5 @@
   "templateUrl": "https://github.com/andrzejkokoszka/AL-Go@v1",
   "CICDPullRequestBranches": [],
   "CICDPushBranches": [],
-  "DeployToUAT": {
-    "Branches": [
-      "uat"
-    ],
-    "EnvironmentName": "UAT",
-    "Projects": "*"
-  },
   "skipUpgrade" : true
 }
