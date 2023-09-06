@@ -34,14 +34,14 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: andrzejkokoszka/AL-Go/Actions/WorkflowInitialize@main
+        uses: andrzejkokoszka/AL-Go/Actions/WorkflowInitialize@v1
         with:
           shell: powershell
           eventId: "DO0100"
 
       - name: Read settings
         id: ReadSettings
-        uses: andrzejkokoszka/AL-Go/Actions/ReadSettings@main
+        uses: andrzejkokoszka/AL-Go/Actions/ReadSettings@v1
         with:
           shell: powershell
 
@@ -52,7 +52,7 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: andrzejkokoszka/AL-Go/Actions/DetermineProjectsToBuild@main
+        uses: andrzejkokoszka/AL-Go/Actions/DetermineProjectsToBuild@v1
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
@@ -89,7 +89,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: andrzejkokoszka/AL-Go/Actions/WorkflowPostProcess@main
+        uses: andrzejkokoszka/AL-Go/Actions/WorkflowPostProcess@v1
         with:
           shell: powershell
           eventId: "DO0100"

@@ -1,6 +1,6 @@
 {
   "type": "PTE",
-  "templateUrl": "https://github.com/andrzejkokoszka/AL-Go@main",
+  "templateUrl": "https://github.com/andrzejkokoszka/AL-Go@v1",
   "CICDPullRequestBranches": [],
   "CICDPushBranches": [],
   "DeployToUAT": {
