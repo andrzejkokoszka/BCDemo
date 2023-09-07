@@ -7,5 +7,5 @@
   "DeployToUAT": {
     "EnvironmentName": "UAT",
     "Projects": "*"
-  },
+  }
 }
