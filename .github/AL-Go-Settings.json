@@ -6,7 +6,6 @@
   "skipUpgrade": true,
   "DeployToUAT(FAT)": {
     "EnvironmentName": "UAT",
-    "Projects": "*",
     "ContinuousDeployment":false
   }
 }
