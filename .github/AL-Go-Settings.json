@@ -5,9 +5,6 @@
   "CICDPushBranches": [],
   "skipUpgrade": true,
   "DeployToUAT": {
-    "Branches": [
-      "uat"
-    ],
     "EnvironmentName": "UAT",
     "Projects": "*"
   },
