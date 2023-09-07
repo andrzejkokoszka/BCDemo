@@ -6,6 +6,7 @@
   "skipUpgrade" : true,
   "DeployToUAT": {
     "EnvironmentName": "UAT",
-    "Projects": "*"
+    "Projects": "*",
+       "ContinuousDeployment":false
   }
 }
