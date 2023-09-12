@@ -6,7 +6,7 @@
   "ConditionalSettings": [
         {
             "workflows": [
-                " CI/CD"
+                "CI/CD"
             ],
             "settings": {
                 "publishArtifacts": true,
