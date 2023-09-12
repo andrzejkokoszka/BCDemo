@@ -4,7 +4,7 @@
   "CICDPullRequestBranches": [],
   "CICDPushBranches": [],
   "skipUpgrade": true,
-    "DeployTouat (FAT)": {
+    "DeployTouat": {
     "EnvironmentName": "UAT",
     "ContinuousDeployment": false,
     "Branches" : ["uat"]
