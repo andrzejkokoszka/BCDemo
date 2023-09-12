@@ -7,6 +7,6 @@
     "DeployTouat": {
     "EnvironmentName": "UAT",
     "ContinuousDeployment": false,
-    "Branches" : ["uat"]
+    "Branches" : ["uat","main"]
   }
 }
