@@ -6,6 +6,7 @@
   "skipUpgrade": true,
   "DeployTouat (FAT)": {
     "EnvironmentName": "uat",
-    "ContinuousDeployment": false
+    "ContinuousDeployment": false,
+    "Branches" : "uat"
   }
 }
