@@ -55,9 +55,6 @@ jobs:
         id: DetermineWorkflowDepth
         run: |
           Add-Content -Encoding UTF8 -Path $env:GITHUB_OUTPUT -Value "WorkflowDepth=$($env:workflowDepth)"
-          Write-Host "WORKFLOWDEPTH"
-          Write-Host $env:workflowDepth
-          Write-Host ${{ env.workflowDepth }}
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
