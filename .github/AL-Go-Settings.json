@@ -10,5 +10,6 @@
     "Branches": [
       "uat"
     ]
-  }
+  },
+  "useProjectDependencies" : true
 }
