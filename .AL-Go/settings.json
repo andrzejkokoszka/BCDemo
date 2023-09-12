@@ -2,5 +2,17 @@
   "country": "us",
   "appFolders": [],
   "testFolders": [],
-  "bcptTestFolders": []
+  "bcptTestFolders": [],
+  	    "ConditionalSettings": [
+        {
+            "workflows": [
+                "CI/CD"
+            ],
+            "settings": {
+                "publishArtifacts": true,
+				"doNotRunTests" : true,
+				"doNotBuildTests" : true
+            }
+        }
+		]
 }
