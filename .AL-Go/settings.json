@@ -3,16 +3,17 @@
   "appFolders": [],
   "testFolders": [],
   "bcptTestFolders": [],
-  	    "ConditionalSettings": [
+  "ConditionalSettings": [
         {
             "workflows": [
                 " CI/CD"
             ],
             "settings": {
                 "publishArtifacts": true,
-				"doNotRunTests" : true,
-				"doNotBuildTests" : true
+		"doNotRunTests" : true,
+		"doNotBuildTests" : true,
+		"workflowDepth" : 2
             }
         }
-		]
+    ]
 }
