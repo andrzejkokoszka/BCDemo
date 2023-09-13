@@ -12,7 +12,37 @@ Param(
     [switch] $fromVSCode
 )
 
-$errorActionPreference = "Stop"; $ProgressPreference = "SilentlyContinue"; Set-StrictMode -Version 2.0
+$ErrorActionPreference = "stop"
+Set-StrictMode -Version 2.0
+
+$pshost = Get-Host
+if ($pshost.Name -eq "Visual Studio Code Host") {
+    $executionPolicy = Get-ExecutionPolicy -Scope CurrentUser
+    Write-Host "Execution Policy is $executionPolicy"
+    if ($executionPolicy -eq "Restricted") {
+        Write-Host "Changing Execution Policy to RemoteSigned"
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+    }
+    if ($MyInvocation.InvocationName -eq '.' -or $MyInvocation.Line -eq '') {
+        $scriptName = Join-Path $PSScriptRoot $MyInvocation.MyCommand
+    }
+    else {
+        $scriptName = $MyInvocation.InvocationName
+    }
+    if (Test-Path -Path $scriptName -PathType Leaf) {
+        $scriptName = (Get-Item -path $scriptName).FullName
+        $pslink = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows PowerShell.lnk"
+        if (!(Test-Path $pslink)) {
+            $pslink = "powershell.exe"
+        }
+        $credstr = ""
+        if ($credential) {
+            $credstr = " -credential (New-Object PSCredential '$($credential.UserName)', ('$($credential.Password | ConvertFrom-SecureString)' | ConvertTo-SecureString))"
+        }
+        Start-Process -Verb runas $pslink @("-Command ""$scriptName"" -fromVSCode -containerName '$containerName' -auth '$auth' -licenseFileUrl '$licenseFileUrl' -insiderSasToken '$insiderSasToken'$credstr")
+        return
+    }
+}
 
 try {
 $webClient = New-Object System.Net.WebClient
@@ -20,27 +50,25 @@ $webClient.CachePolicy = New-Object System.Net.Cache.RequestCachePolicy -argumen
 $webClient.Encoding = [System.Text.Encoding]::UTF8
 Write-Host "Downloading GitHub Helper module"
 $GitHubHelperPath = "$([System.IO.Path]::GetTempFileName()).psm1"
-$webClient.DownloadFile('https://raw.githubusercontent.com/microsoft/AL-Go/31be77d8466260c22e324516ec543285e6dfc521/Actions/Github-Helper.psm1', $GitHubHelperPath)
+$webClient.DownloadFile('https://raw.githubusercontent.com/solteq-andrzejkokoszka/AL-Go-Actions/main/Github-Helper.psm1', $GitHubHelperPath)
 Write-Host "Downloading AL-Go Helper script"
 $ALGoHelperPath = "$([System.IO.Path]::GetTempFileName()).ps1"
-$webClient.DownloadFile('https://raw.githubusercontent.com/microsoft/AL-Go/31be77d8466260c22e324516ec543285e6dfc521/Actions/AL-Go-Helper.ps1', $ALGoHelperPath)
+$webClient.DownloadFile('https://raw.githubusercontent.com/solteq-andrzejkokoszka/AL-Go-Actions/main/AL-Go-Helper.ps1', $ALGoHelperPath)
 
 Import-Module $GitHubHelperPath
 . $ALGoHelperPath -local
 
-$baseFolder = GetBaseFolder -folder $PSScriptRoot
-$project = GetProject -baseFolder $baseFolder -projectALGoFolder $PSScriptRoot
+$baseFolder = Join-Path $PSScriptRoot ".." -Resolve
 
 Clear-Host
-Write-Host
 Write-Host -ForegroundColor Yellow @'
-  _                     _   _____             ______
- | |                   | | |  __ \           |  ____|
+  _                     _   _____             ______            
+ | |                   | | |  __ \           |  ____|           
  | |     ___   ___ __ _| | | |  | | _____   __ |__   _ ____   __
  | |    / _ \ / __/ _` | | | |  | |/ _ \ \ / /  __| | '_ \ \ / /
- | |____ (_) | (__ (_| | | | |__| |  __/\ V /| |____| | | \ V /
- |______\___/ \___\__,_|_| |_____/ \___| \_/ |______|_| |_|\_/
-
+ | |____ (_) | (__ (_| | | | |__| |  __/\ V /| |____| | | \ V / 
+ |______\___/ \___\__,_|_| |_____/ \___| \_/ |______|_| |_|\_/  
+                                                                
 '@
 
 Write-Host @'
@@ -54,7 +82,7 @@ The script will also modify launch.json to have a Local Sandbox configuration po
 
 '@
 
-$settings = ReadSettings -baseFolder $baseFolder -project $project -userName $env:USERNAME
+$settings = ReadSettings -baseFolder $baseFolder -userName $env:USERNAME
 
 Write-Host "Checking System Requirements"
 $dockerProcess = (Get-Process "dockerd" -ErrorAction Ignore)
@@ -63,7 +91,7 @@ if (!($dockerProcess)) {
 }
 if ($settings.keyVaultName) {
     if (-not (Get-Module -ListAvailable -Name 'Az.KeyVault')) {
-        Write-Host -ForegroundColor Red "A keyvault name is defined in Settings, you need to have the Az.KeyVault PowerShell module installed (use Install-Module az) or you can set the keyVaultName to an empty string in the user settings file ($($ENV:UserName).settings.json)."
+        Write-Host -ForegroundColor Red "A keyvault name is defined in Settings, you need to have the Az.KeyVault PowerShell module installed (use Install-Module az) or you can set the keyVaultName to an empty string in the user settings file ($($ENV:UserName).Settings.json)."
     }
 }
 
@@ -73,8 +101,7 @@ if (-not $containerName) {
     $containerName = Enter-Value `
         -title "Container name" `
         -question "Please enter the name of the container to create" `
-        -default "bcserver" `
-        -trimCharacters @('"',"'",' ')
+        -default "bcserver"
 }
 
 if (-not $auth) {
@@ -101,8 +128,8 @@ if (-not $credential) {
 
 if (-not $licenseFileUrl) {
     if ($settings.type -eq "AppSource App") {
-        $description = "When developing AppSource Apps for Business Central versions prior to 22, your local development environment needs the developer licensefile with permissions to your AppSource app object IDs"
-        $default = "none"
+        $description = "When developing AppSource Apps, your local development environment needs the developer licensefile with permissions to your AppSource app object IDs"
+        $default = ""
     }
     else {
         $description = "When developing PTEs, you can optionally specify a developer licensefile with permissions to object IDs of your dependant apps"
@@ -113,13 +140,11 @@ if (-not $licenseFileUrl) {
         -title "LicenseFileUrl" `
         -description $description `
         -question "Local path or a secure download URL to license file " `
-        -default $default `
-        -doNotConvertToLower `
-        -trimCharacters @('"',"'",' ')
-}
+        -default $default
 
-if ($licenseFileUrl -eq "none") {
-    $licenseFileUrl = ""
+    if ($licenseFileUrl -eq "none") {
+        $licenseFileUrl = ""
+    }
 }
 
 CreateDevEnv `
@@ -127,11 +152,10 @@ CreateDevEnv `
     -caller local `
     -containerName $containerName `
     -baseFolder $baseFolder `
-    -project $project `
     -auth $auth `
     -credential $credential `
-    -licenseFileUrl $licenseFileUrl `
-    -insiderSasToken $insiderSasToken
+    -LicenseFileUrl $licenseFileUrl `
+    -InsiderSasToken $insiderSasToken
 }
 catch {
     Write-Host -ForegroundColor Red "Error: $($_.Exception.Message)`nStacktrace: $($_.scriptStackTrace)"
