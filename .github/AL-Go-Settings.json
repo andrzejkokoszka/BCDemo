@@ -8,7 +8,7 @@
     "EnvironmentName": "UAT",
     "ContinuousDeployment": false,
     "Branches": [
-      "uat"
+      "release/uat"
     ]
   }
 }
