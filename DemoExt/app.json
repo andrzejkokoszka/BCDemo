@@ -2,7 +2,7 @@
   "id": "02b3b1c6-b5a7-4b68-a78d-af8373f32787",
   "name": "ReleaseTest",
   "publisher": "anko",
-  "version": "2.1.0.0",
+  "version": "2.3.0.0",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -16,8 +16,8 @@
   "application": "22.0.0.0",
   "idRanges": [
     {
-      "from": 50000,
-      "to": 50010
+      "from": 50010,
+      "to": 50020
     }
   ],
   "features": [

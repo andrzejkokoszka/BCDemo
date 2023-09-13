@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "al",
+            "request": "launch",
+            "name": "BCDemo",
+"startupObjectId": 22,
+            "startupObjectType": "Page",
+            "breakOnError": "All",
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "environmentType": "Sandbox",
+            "server": "https://businesscentral.dynamics.com/",
+            "environmentName" : "UAT",
+            "tenant": "d9fb7145-520e-4a1d-9f42-14f9650809ef",
+            "schemaUpdateMode": "ForceSync"
+        }
+    ]
+}   
