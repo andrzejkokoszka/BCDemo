@@ -9,54 +9,35 @@ Param(
     [switch] $fromVSCode
 )
 
-$ErrorActionPreference = "stop"
-Set-StrictMode -Version 2.0
-
-$pshost = Get-Host
-if ($pshost.Name -eq "Visual Studio Code Host") {
-    $executionPolicy = Get-ExecutionPolicy -Scope CurrentUser
-    Write-Host "Execution Policy is $executionPolicy"
-    if ($executionPolicy -eq "Restricted") {
-        Write-Host "Changing Execution Policy to RemoteSigned"
-        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-    }
-    if ($MyInvocation.InvocationName -eq '.' -or $MyInvocation.Line -eq '') {
-        $scriptName = Join-Path $PSScriptRoot $MyInvocation.MyCommand
-    }
-    else {
-        $scriptName = $MyInvocation.InvocationName
-    }
-    if (Test-Path -Path $scriptName -PathType Leaf) {
-        $scriptName = (Get-Item -path $scriptName).FullName
-        $pslink = Join-Path $env:APPDATA "Microsoft\Windows\Start Menu\Programs\Windows PowerShell\Windows PowerShell.lnk"
-        if (!(Test-Path $pslink)) {
-            $pslink = "powershell.exe"
-        }
-        Start-Process -Verb runas $pslink @("-Command ""$scriptName"" -fromVSCode -environmentName '$environmentName' -reuseExistingEnvironment `$$reuseExistingEnvironment")
-        return
-    }
-}
+$errorActionPreference = "Stop"; $ProgressPreference = "SilentlyContinue"; Set-StrictMode -Version 2.0
 
 try {
-$ALGoHelperPath = "$([System.IO.Path]::GetTempFileName()).ps1"
 $webClient = New-Object System.Net.WebClient
 $webClient.CachePolicy = New-Object System.Net.Cache.RequestCachePolicy -argumentList ([System.Net.Cache.RequestCacheLevel]::NoCacheNoStore)
 $webClient.Encoding = [System.Text.Encoding]::UTF8
+Write-Host "Downloading GitHub Helper module"
+$GitHubHelperPath = "$([System.IO.Path]::GetTempFileName()).psm1"
+$webClient.DownloadFile('https://raw.githubusercontent.com/microsoft/AL-Go/31be77d8466260c22e324516ec543285e6dfc521/Actions/Github-Helper.psm1', $GitHubHelperPath)
 Write-Host "Downloading AL-Go Helper script"
-$webClient.DownloadFile('https://raw.githubusercontent.com/solteq-andrzejkokoszka/AL-Go-Actions/main/AL-Go-Helper.ps1', $ALGoHelperPath)
+$ALGoHelperPath = "$([System.IO.Path]::GetTempFileName()).ps1"
+$webClient.DownloadFile('https://raw.githubusercontent.com/microsoft/AL-Go/31be77d8466260c22e324516ec543285e6dfc521/Actions/AL-Go-Helper.ps1', $ALGoHelperPath)
+
+Import-Module $GitHubHelperPath
 . $ALGoHelperPath -local
 
-$baseFolder = Join-Path $PSScriptRoot ".." -Resolve
+$baseFolder = GetBaseFolder -folder $PSScriptRoot
+$project = GetProject -baseFolder $baseFolder -projectALGoFolder $PSScriptRoot
 
 Clear-Host
+Write-Host
 Write-Host -ForegroundColor Yellow @'
-   _____ _                 _   _____             ______            
-  / ____| |               | | |  __ \           |  ____|           
+   _____ _                 _   _____             ______
+  / ____| |               | | |  __ \           |  ____|
  | |    | | ___  _   _  __| | | |  | | _____   __ |__   _ ____   __
  | |    | |/ _ \| | | |/ _` | | |  | |/ _ \ \ / /  __| | '_ \ \ / /
- | |____| | (_) | |_| | (_| | | |__| |  __/\ V /| |____| | | \ V / 
-  \_____|_|\___/ \__,_|\__,_| |_____/ \___| \_/ |______|_| |_|\_/  
-                                                                   
+ | |____| | (_) | |_| | (_| | | |__| |  __/\ V /| |____| | | \ V /
+  \_____|_|\___/ \__,_|\__,_| |_____/ \___| \_/ |______|_| |_|\_/
+
 '@
 
 Write-Host @'
@@ -70,18 +51,17 @@ if (Test-Path (Join-Path $PSScriptRoot "NewBcContainer.ps1")) {
     Write-Host -ForegroundColor Red "WARNING: The project has a NewBcContainer override defined. Typically, this means that you cannot run a cloud development environment"
 }
 
-$settings = ReadSettings -baseFolder $baseFolder -userName $env:USERNAME
-
 Write-Host
 
 if (-not $environmentName) {
     $environmentName = Enter-Value `
         -title "Environment name" `
         -question "Please enter the name of the environment to create" `
-        -default "$($env:USERNAME)-sandbox"
+        -default "$($env:USERNAME)-sandbox" `
+        -trimCharacters @('"',"'",' ')
 }
 
-if (-not $PSBoundParameters.ContainsKey('reuseExistingEnvironment')) {
+if ($PSBoundParameters.Keys -notcontains 'reuseExistingEnvironment') {
     $reuseExistingEnvironment = (Select-Value `
         -title "What if the environment already exists?" `
         -options @{ "Yes" = "Reuse existing environment"; "No" = "Recreate environment" } `
@@ -94,7 +74,8 @@ CreateDevEnv `
     -caller local `
     -environmentName $environmentName `
     -reuseExistingEnvironment:$reuseExistingEnvironment `
-    -baseFolder $baseFolder
+    -baseFolder $baseFolder `
+    -project $project
 }
 catch {
     Write-Host -ForegroundColor Red "Error: $($_.Exception.Message)`nStacktrace: $($_.scriptStackTrace)"
