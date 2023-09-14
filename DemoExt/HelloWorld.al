@@ -6,7 +6,7 @@ pageextension 50020 VendorListExt extends "Vendor List"
 {
     trigger OnOpenPage();
     begin
-        Message('This is UAT - DemoExt');
+        Message('This is MAIN - DemoExt');
     end;
 }
 
