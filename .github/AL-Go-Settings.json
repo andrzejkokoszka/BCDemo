@@ -1,6 +1,6 @@
 {
   "type": "PTE",
-  "templateUrl": "https://github.com/andrzejkokoszka/AL-Go@v2",
+  "templateUrl": "https://github.com/microsoft/AL-Go@main",
   "CICDPullRequestBranches": [],
   "CICDPushBranches": [],
   "skipUpgrade": true,
